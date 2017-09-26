@@ -1,3 +1,9 @@
 <resources>
-<string name="app_name">酷欧天气</string>
+
+    <string name="app_name">"酷欧天气"</string>
+    <string name="china">"中国"</string>
+    <string name="comfort">"舒适度："</string>
+    <string name="car">"洗车指数："</string>
+    <string name="sport">"运动建议："</string>
+
 </resources>

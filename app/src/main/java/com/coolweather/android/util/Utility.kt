@@ -13,9 +13,6 @@ import org.json.JSONException
 import org.json.JSONObject
 
 object Utility {
-    /**
-     * 解析和处理服务器返回的省级数据
-     */
     fun handleProvinceResponse(response: String): Boolean {
         if (!TextUtils.isEmpty(response)) {
             try {
@@ -31,14 +28,10 @@ object Utility {
             } catch (e: JSONException) {
                 e.printStackTrace()
             }
-
         }
         return false
     }
 
-    /**
-     * 解析和处理服务器返回的市级数据
-     */
     fun handleCityResponse(response: String, provinceId: Int): Boolean {
         if (!TextUtils.isEmpty(response)) {
             try {
@@ -55,14 +48,10 @@ object Utility {
             } catch (e: JSONException) {
                 e.printStackTrace()
             }
-
         }
         return false
     }
 
-    /**
-     * 解析和处理服务器返回的县级数据
-     */
     fun handleCountyResponse(response: String, cityId: Int): Boolean {
         if (!TextUtils.isEmpty(response)) {
             try {
@@ -79,14 +68,10 @@ object Utility {
             } catch (e: JSONException) {
                 e.printStackTrace()
             }
-
         }
         return false
     }
 
-    /**
-     * 将返回的JSON数据解析成Weather实体类
-     */
     fun handleWeatherResponse(response: String): Weather? {
         try {
             val jsonObject = JSONObject(response)
@@ -96,7 +81,6 @@ object Utility {
         } catch (e: Exception) {
             e.printStackTrace()
         }
-
         return null
     }
 }

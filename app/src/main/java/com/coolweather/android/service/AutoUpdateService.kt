@@ -49,7 +49,7 @@ class AutoUpdateService : Service() {
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         val weatherString = prefs.getString("weather", null)
         if (weatherString != null) {
-            //get info directly if has cached
+            // get info directly if has cached
             val weather = Utility.handleWeatherResponse(weatherString)
             val weatherId = weather!!.basic!!.weatherId
             val weatherUrl = "http://guolin.tech/api/weather?cityid=$weatherId&key=bc0418b57b2d4918819d3974ac1285d9"

@@ -77,7 +77,7 @@ class WeatherActivity : AppCompatActivity() {
             getWindow().setStatusBarColor(Color.TRANSPARENT)
         }
         setContentView(R.layout.activity_weather)
-        //init views
+        // init views
         bingPicImg = findViewById(R.id.bing_pic_img) as ImageView
         weatherLayout = findViewById(R.id.weather_layout) as ScrollView
         titleCity = findViewById(R.id.title_city) as TextView
@@ -95,12 +95,12 @@ class WeatherActivity : AppCompatActivity() {
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         val weatherString = prefs.getString("weather", null)
         if (weatherString != null) {
-            //via cache
+            // via cache
             val weather = Utility.handleWeatherResponse(weatherString)
             mWeatherId = weather!!.basic!!.weatherId
             showWeatherInfo(weather)
         } else {
-            //via network
+            // via network
             mWeatherId = getIntent().getStringExtra("weather_id")
             weatherLayout!!.visibility = View.INVISIBLE
             requestWeather(mWeatherId)

@@ -217,7 +217,7 @@ class ChooseAreaFragment : Fragment() {
             }
 
             override fun onFailure(call: Call, e: IOException) {
-                //run on main thread
+                // run on main thread
                 activity.runOnUiThread(Runnable {
                     closeProgressDialog()
                     Toast.makeText(context, "load failed", Toast.LENGTH_SHORT).show()
@@ -256,5 +256,4 @@ class ChooseAreaFragment : Fragment() {
 
         val LEVEL_COUNTY = 2
     }
-
 }

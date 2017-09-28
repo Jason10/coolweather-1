@@ -34,7 +34,9 @@ import kotlinx.android.synthetic.main.choose_area.*
 class ChooseAreaFragment : Fragment() {
     private var progressDialog: ProgressDialog? = null
 
-    private var adapter: ArrayAdapter<String>? = null
+    private val adapter by lazy {
+        ArrayAdapter(context, android.R.layout.simple_list_item_1, dataList)
+    }
 
     private val dataList = ArrayList<String>()
 
@@ -58,7 +60,6 @@ class ChooseAreaFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        adapter = ArrayAdapter(context, android.R.layout.simple_list_item_1, dataList)
         list_view.adapter = adapter
         list_view.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
             when (currentLevel) {
@@ -111,7 +112,7 @@ class ChooseAreaFragment : Fragment() {
                 it.map {
                     dataList.add(it.provinceName!!)
                 }
-                adapter!!.notifyDataSetChanged()
+                adapter.notifyDataSetChanged()
                 list_view.setSelection(0)
                 currentLevel = LEVEL_PROVINCE
                 return
@@ -131,7 +132,7 @@ class ChooseAreaFragment : Fragment() {
                 it.map {
                     dataList.add(it.cityName!!)
                 }
-                adapter!!.notifyDataSetChanged()
+                adapter.notifyDataSetChanged()
                 list_view.setSelection(0)
                 currentLevel = LEVEL_CITY
                 return
@@ -153,7 +154,7 @@ class ChooseAreaFragment : Fragment() {
                 it.map {
                     dataList.add(it.countyName!!)
                 }
-                adapter!!.notifyDataSetChanged()
+                adapter.notifyDataSetChanged()
                 list_view.setSelection(0)
                 currentLevel = LEVEL_COUNTY
                 return

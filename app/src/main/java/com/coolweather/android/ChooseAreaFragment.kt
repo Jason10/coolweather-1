@@ -61,27 +61,31 @@ class ChooseAreaFragment : Fragment() {
         adapter = ArrayAdapter(context, android.R.layout.simple_list_item_1, dataList)
         list_view.adapter = adapter
         list_view.onItemClickListener = AdapterView.OnItemClickListener { _, _, position, _ ->
-            if (currentLevel == LEVEL_PROVINCE) {
-                selectedProvince = provinceList!![position]
-                queryCities()
-            } else if (currentLevel == LEVEL_CITY) {
-                selectedCity = cityList!![position]
-                queryCounties()
-            } else if (currentLevel == LEVEL_COUNTY) {
-                val weatherId = countyList!![position].weatherId
-                weatherId?.let {
-                    when (activity) {
-                        is MainActivity -> {
-                            val intent = Intent(activity, WeatherActivity::class.java)
-                            intent.putExtra("weather_id", weatherId)
-                            startActivity(intent)
-                            activity.finish()
-                        }
-                        is WeatherActivity -> {
-                            val activity = activity as WeatherActivity
-                            activity.drawerLayout.closeDrawers()
-                            activity.swipeRefresh.isRefreshing = true
-                            activity.requestWeather(weatherId)
+            when (currentLevel) {
+                LEVEL_PROVINCE -> {
+                    selectedProvince = provinceList!![position]
+                    queryCities()
+                }
+                LEVEL_CITY -> {
+                    selectedCity = cityList!![position]
+                    queryCounties()
+                }
+                LEVEL_COUNTY -> {
+                    val weatherId = countyList!![position].weatherId
+                    weatherId?.let {
+                        when (activity) {
+                            is MainActivity -> {
+                                val intent = Intent(activity, WeatherActivity::class.java)
+                                intent.putExtra("weather_id", weatherId)
+                                startActivity(intent)
+                                activity.finish()
+                            }
+                            is WeatherActivity -> {
+                                val activity = activity as WeatherActivity
+                                activity.drawerLayout.closeDrawers()
+                                activity.swipeRefresh.isRefreshing = true
+                                activity.requestWeather(weatherId)
+                            }
                         }
                     }
                 }
@@ -110,8 +114,8 @@ class ChooseAreaFragment : Fragment() {
                 adapter!!.notifyDataSetChanged()
                 list_view.setSelection(0)
                 currentLevel = LEVEL_PROVINCE
+                return
             }
-            return
         }
         queryFromServer(HttpUtil.China, "province")
     }
@@ -130,8 +134,8 @@ class ChooseAreaFragment : Fragment() {
                 adapter!!.notifyDataSetChanged()
                 list_view.setSelection(0)
                 currentLevel = LEVEL_CITY
+                return
             }
-            return
         }
         val provinceCode = selectedProvince!!.provinceCode
         val address = "${HttpUtil.China}/$provinceCode"
@@ -152,8 +156,8 @@ class ChooseAreaFragment : Fragment() {
                 adapter!!.notifyDataSetChanged()
                 list_view.setSelection(0)
                 currentLevel = LEVEL_COUNTY
+                return
             }
-            return
         }
         val provinceCode = selectedProvince!!.provinceCode
         val cityCode = selectedCity!!.cityCode

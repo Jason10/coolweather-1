@@ -7,7 +7,8 @@ class County : DataSupport() {
 
     var countyName: String? = null
 
-    var weatherId: String? = null  //via the id to get weather info
+    // via the id to get weather info
+    var weatherId: String? = null
 
     var cityId: Int = 0
 }

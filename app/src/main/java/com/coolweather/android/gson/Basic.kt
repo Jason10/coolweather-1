@@ -3,6 +3,7 @@ package com.coolweather.android.gson
 import com.google.gson.annotations.SerializedName
 
 class Basic {
+    // @SerializedName fix the cityName<>city, increase readability
     @SerializedName("city")
     var cityName: String? = null
 

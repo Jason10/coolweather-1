@@ -32,7 +32,18 @@ import okhttp3.Call
 import okhttp3.Callback
 import okhttp3.Response
 
+import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.activity_weather.*
+import kotlinx.android.synthetic.main.suggestion.*
+import kotlinx.android.synthetic.main.title.*
+import kotlinx.android.synthetic.main.now.*
+import kotlinx.android.synthetic.main.forecast.*
+import kotlinx.android.synthetic.main.aqi.*
+
+
 class WeatherActivity : AppCompatActivity() {
+    private var mWeatherId: String? = null
+
     val drawerLayout by lazy {
         findViewById(R.id.drawer_layout) as DrawerLayout
     }
@@ -40,34 +51,6 @@ class WeatherActivity : AppCompatActivity() {
     val swipeRefresh by lazy {
         findViewById(R.id.swipe_refresh) as SwipeRefreshLayout
     }
-
-    private var weatherLayout: ScrollView? = null
-
-    private var navButton: Button? = null
-
-    private var titleCity: TextView? = null
-
-    private var titleUpdateTime: TextView? = null
-
-    private var degreeText: TextView? = null
-
-    private var weatherInfoText: TextView? = null
-
-    private var forecastLayout: LinearLayout? = null
-
-    private var aqiText: TextView? = null
-
-    private var pm25Text: TextView? = null
-
-    private var comfortText: TextView? = null
-
-    private var carWashText: TextView? = null
-
-    private var sportText: TextView? = null
-
-    private var bingPicImg: ImageView? = null
-
-    private var mWeatherId: String? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -77,49 +60,42 @@ class WeatherActivity : AppCompatActivity() {
             getWindow().setStatusBarColor(Color.TRANSPARENT)
         }
         setContentView(R.layout.activity_weather)
-        // init views
-        bingPicImg = findViewById(R.id.bing_pic_img) as ImageView
-        weatherLayout = findViewById(R.id.weather_layout) as ScrollView
-        titleCity = findViewById(R.id.title_city) as TextView
-        titleUpdateTime = findViewById(R.id.title_update_time) as TextView
-        degreeText = findViewById(R.id.degree_text) as TextView
-        weatherInfoText = findViewById(R.id.weather_info_text) as TextView
-        forecastLayout = findViewById(R.id.forecast_layout) as LinearLayout
-        aqiText = findViewById(R.id.aqi_text) as TextView
-        pm25Text = findViewById(R.id.pm25_text) as TextView
-        comfortText = findViewById(R.id.comfort_text) as TextView
-        carWashText = findViewById(R.id.car_wash_text) as TextView
-        sportText = findViewById(R.id.sport_text) as TextView
-        swipeRefresh.setColorSchemeResources(R.color.colorPrimary)
-        navButton = findViewById(R.id.nav_button) as Button
+
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         val weatherString = prefs.getString("weather", null)
         if (weatherString != null) {
             // via cache
             val weather = Utility.handleWeatherResponse(weatherString)
-            mWeatherId = weather!!.basic!!.weatherId
-            showWeatherInfo(weather)
+            weather?.let {
+                mWeatherId = it.basic!!.weatherId
+                showWeatherInfo(it)
+            }
         } else {
             // via network
             mWeatherId = getIntent().getStringExtra("weather_id")
-            weatherLayout!!.visibility = View.INVISIBLE
-            requestWeather(mWeatherId)
+            mWeatherId?.let {
+                weather_layout.visibility = View.INVISIBLE
+                requestWeather(it)
+            }
         }
-        swipeRefresh.setOnRefreshListener { requestWeather(mWeatherId) }
-        navButton!!.setOnClickListener { drawerLayout.openDrawer(GravityCompat.START) }
+        swipeRefresh.setOnRefreshListener {
+            mWeatherId?.let {
+                requestWeather(it)
+            }
+        }
+        nav_button.setOnClickListener {
+            drawerLayout.openDrawer(GravityCompat.START)
+        }
         val bingPic = prefs.getString("bing_pic", null)
         if (bingPic != null) {
-            Glide.with(this).load(bingPic).into(bingPicImg!!)
+            Glide.with(this).load(bingPic).into(bing_pic_img)
         } else {
             loadBingPic()
         }
     }
 
-    /**
-     * request weather info via id
-     */
-    fun requestWeather(weatherId: String?) {
-        val weatherUrl = "http://guolin.tech/api/weather?cityid=$weatherId&key=bc0418b57b2d4918819d3974ac1285d9"
+    fun requestWeather(weatherId: String) {
+        val weatherUrl = "${HttpUtil.Url}?cityid=$weatherId&${HttpUtil.Key}"
         HttpUtil.sendOkHttpRequest(weatherUrl, object : Callback {
             @Throws(IOException::class)
             override fun onResponse(call: Call, response: Response) {
@@ -150,19 +126,18 @@ class WeatherActivity : AppCompatActivity() {
         loadBingPic()
     }
 
-    /**
-     * load image from bing
-     */
     private fun loadBingPic() {
-        val requestBingPic = "http://guolin.tech/api/bing_pic"
-        HttpUtil.sendOkHttpRequest(requestBingPic, object : Callback {
+        HttpUtil.sendOkHttpRequest(HttpUtil.Bing, object : Callback {
             @Throws(IOException::class)
             override fun onResponse(call: Call, response: Response) {
                 val bingPic = response.body().string()
-                val editor = PreferenceManager.getDefaultSharedPreferences(this@WeatherActivity).edit()
+                val editor = PreferenceManager.getDefaultSharedPreferences(
+                        this@WeatherActivity).edit()
                 editor.putString("bing_pic", bingPic)
                 editor.apply()
-                runOnUiThread(Runnable { Glide.with(this@WeatherActivity).load(bingPic).into(bingPicImg!!) })
+                runOnUiThread(Runnable {
+                    Glide.with(this@WeatherActivity).load(bingPic).into(bing_pic_img)
+                })
             }
 
             override fun onFailure(call: Call, e: IOException) {
@@ -171,42 +146,41 @@ class WeatherActivity : AppCompatActivity() {
         })
     }
 
-    /**
-     * process and show info
-     */
-    private fun showWeatherInfo(weather: Weather?) {
-        val cityName = weather!!.basic!!.cityName
-        val updateTime = weather.basic!!.update!!.updateTime!!.split(" ".toRegex()).dropLastWhile { it.isEmpty() }.toTypedArray()[1]
+    private fun showWeatherInfo(weather: Weather) {
+        val cityName = weather.basic!!.cityName
+        val updateTime = weather.basic!!.update!!.updateTime!!.split(" ".toRegex()).
+                dropLastWhile { it.isEmpty() }.toTypedArray()[1]
         val degree = weather.now!!.temperature!! + "℃"
         val weatherInfo = weather.now!!.more!!.info
-        titleCity!!.text = cityName
-        titleUpdateTime!!.text = updateTime
-        degreeText!!.text = degree
-        weatherInfoText!!.text = weatherInfo
-        forecastLayout!!.removeAllViews()
-        for (forecast in weather.forecastList!!) {
-            val view = LayoutInflater.from(this).inflate(R.layout.forecast_item, forecastLayout, false)
+        title_city.text = cityName
+        title_update_time.text = updateTime
+        degree_text.text = degree
+        weather_info_text.text = weatherInfo
+        forecast_layout.removeAllViews()
+        weather.forecastList!!.map {
+            val view = LayoutInflater.from(this).inflate(R.layout.forecast_item,
+                    forecast_layout, false)
             val dateText = view.findViewById(R.id.date_text) as TextView
             val infoText = view.findViewById(R.id.info_text) as TextView
             val maxText = view.findViewById(R.id.max_text) as TextView
             val minText = view.findViewById(R.id.min_text) as TextView
-            dateText.text = forecast.date
-            infoText.text = forecast.more!!.info
-            maxText.text = forecast.temperature!!.max
-            minText.text = forecast.temperature!!.min
-            forecastLayout!!.addView(view)
+            dateText.text = it.date
+            infoText.text = it.more!!.info
+            maxText.text = it.temperature!!.max
+            minText.text = it.temperature!!.min
+            forecast_layout.addView(view)
         }
-        if (weather.aqi != null) {
-            aqiText!!.text = weather.aqi!!.city!!.aqi
-            pm25Text!!.text = weather.aqi!!.city!!.pm25
+        weather.aqi?.let {
+            aqi_text.text = it.city!!.aqi
+            pm25_text.text = it.city!!.pm25
         }
         val comfort = resources.getString(R.string.comfort) + weather.suggestion!!.comfort!!.info!!
         val carWash = resources.getString(R.string.car) + weather.suggestion!!.carWash!!.info!!
         val sport = resources.getString(R.string.sport) + weather.suggestion!!.sport!!.info!!
-        comfortText!!.text = comfort
-        carWashText!!.text = carWash
-        sportText!!.text = sport
-        weatherLayout!!.visibility = View.VISIBLE
+        comfort_text.text = comfort
+        car_wash_text.text = carWash
+        sport_text.text = sport
+        weather_layout.visibility = View.VISIBLE
         val intent = Intent(this, AutoUpdateService::class.java)
         startService(intent)
     }

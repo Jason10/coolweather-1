@@ -30,58 +30,58 @@ class AutoUpdateService : Service() {
         updateBingPic()
 
         val manager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val anHour = 8 * 60 * 60 * 1000 //the number of milliseconds in eight hours
-        val triggerAtTime = SystemClock.elapsedRealtime() + anHour
+        // the number of milliseconds in eight hours
+        val interval = 8 * 60 * 60 * 1000
+        val triggerAtTime = SystemClock.elapsedRealtime() + interval
         val i = Intent(this, AutoUpdateService::class.java)
         val pi = PendingIntent.getService(this, 0, i, 0)
-        if (manager != null) {
-            manager.cancel(pi)
-            manager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtTime, pi)
-        }
+        manager.cancel(pi)
+        manager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtTime, pi)
 
         return super.onStartCommand(intent, flags, startId)
     }
 
-    /**
-     * update weather info
-     */
     private fun updateWeather() {
         val prefs = PreferenceManager.getDefaultSharedPreferences(this)
         val weatherString = prefs.getString("weather", null)
-        if (weatherString != null) {
+        weatherString?.let {
             // get info directly if has cached
-            val weather = Utility.handleWeatherResponse(weatherString)
-            val weatherId = weather!!.basic!!.weatherId
-            val weatherUrl = "http://guolin.tech/api/weather?cityid=$weatherId&key=bc0418b57b2d4918819d3974ac1285d9"
-            HttpUtil.sendOkHttpRequest(weatherUrl, object : Callback {
-                @Throws(IOException::class)
-                override fun onResponse(call: Call, response: Response) {
-                    val responseText = response.body().string()
-                    val weather = Utility.handleWeatherResponse(responseText)
-                    if (weather != null && "ok" == weather.status) {
-                        val editor = PreferenceManager.getDefaultSharedPreferences(this@AutoUpdateService).edit()
-                        editor.putString("weather", responseText)
-                        editor.apply()
-                    }
-                }
+            val weather = Utility.handleWeatherResponse(it)
+            weather?.let {
+                val basic = it.basic
+                basic?.let {
+                    val weatherId = it.weatherId
+                    val weatherUrl = "${HttpUtil.Url}?cityid=$weatherId&${HttpUtil.Key}"
+                    HttpUtil.sendOkHttpRequest(weatherUrl, object : Callback {
+                        @Throws(IOException::class)
+                        override fun onResponse(call: Call, response: Response) {
+                            val responseText = response.body().string()
+                            val weatherInfo = Utility.handleWeatherResponse(responseText)
+                            weatherInfo?.let {
+                                if ("ok" == it.status) {
+                                    val editor = PreferenceManager.getDefaultSharedPreferences(this@AutoUpdateService).edit()
+                                    editor.putString("weather", responseText)
+                                    editor.apply()
+                                }
+                            }
+                        }
 
-                override fun onFailure(call: Call, e: IOException) {
-                    e.printStackTrace()
+                        override fun onFailure(call: Call, e: IOException) {
+                            e.printStackTrace()
+                        }
+                    })
                 }
-            })
+            }
         }
     }
 
-    /**
-     * update every day image from bing
-     */
     private fun updateBingPic() {
-        val requestBingPic = "http://guolin.tech/api/bing_pic"
-        HttpUtil.sendOkHttpRequest(requestBingPic, object : Callback {
+        HttpUtil.sendOkHttpRequest(HttpUtil.Bing, object : Callback {
             @Throws(IOException::class)
             override fun onResponse(call: Call, response: Response) {
                 val bingPic = response.body().string()
-                val editor = PreferenceManager.getDefaultSharedPreferences(this@AutoUpdateService).edit()
+                val editor = PreferenceManager.getDefaultSharedPreferences(
+                        this@AutoUpdateService).edit()
                 editor.putString("bing_pic", bingPic)
                 editor.apply()
             }

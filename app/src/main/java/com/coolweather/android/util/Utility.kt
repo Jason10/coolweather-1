@@ -24,6 +24,7 @@ object Utility {
                     province.provinceCode = provinceObject.getInt("id")
                     province.save()
                 }
+
                 return true
             } catch (e: JSONException) {
                 e.printStackTrace()
@@ -44,6 +45,7 @@ object Utility {
                     city.provinceId = provinceId
                     city.save()
                 }
+
                 return true
             } catch (e: JSONException) {
                 e.printStackTrace()
@@ -64,6 +66,7 @@ object Utility {
                     county.cityId = cityId
                     county.save()
                 }
+
                 return true
             } catch (e: JSONException) {
                 e.printStackTrace()
@@ -77,6 +80,7 @@ object Utility {
             val jsonObject = JSONObject(response)
             val jsonArray = jsonObject.getJSONArray("HeWeather")
             val weatherContent = jsonArray.getJSONObject(0).toString()
+
             return Gson().fromJson(weatherContent, Weather::class.java)
         } catch (e: Exception) {
             e.printStackTrace()

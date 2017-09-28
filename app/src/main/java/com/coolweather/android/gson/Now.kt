@@ -3,7 +3,7 @@ package com.coolweather.android.gson
 import com.google.gson.annotations.SerializedName
 
 class Now {
-    @SerializedName("tmp")  //via annotation to fix temperature--tmp
+    @SerializedName("tmp")
     var temperature: String? = null
 
     @SerializedName("cond")

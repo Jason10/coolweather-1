@@ -87,16 +87,22 @@ class ChooseAreaFragment : Fragment() {
                                 activity.swipeRefresh.isRefreshing = true
                                 activity.requestWeather(weatherId)
                             }
+                            else -> {}
                         }
                     }
                 }
+                else -> {}
             }
         }
         back_button.setOnClickListener {
-            if (currentLevel == LEVEL_COUNTY) {
-                queryCities()
-            } else if (currentLevel == LEVEL_CITY) {
-                queryProvinces()
+            when (currentLevel) {
+                LEVEL_COUNTY -> {
+                    queryCities()
+                }
+                LEVEL_CITY -> {
+                    queryProvinces()
+                }
+                else -> {}
             }
         }
         queryProvinces()
@@ -124,8 +130,8 @@ class ChooseAreaFragment : Fragment() {
     private fun queryCities() {
         title_text.text = selectedProvince!!.provinceName
         back_button.visibility = View.VISIBLE
-        cityList = DataSupport.where("provinceid = ?",
-                selectedProvince!!.id.toString()).find(City::class.java)
+        cityList = DataSupport.where("provinceid = ?", selectedProvince!!.id.toString())
+                .find(City::class.java)
         cityList?.let {
             if (it.isNotEmpty()) {
                 dataList.clear()
@@ -146,8 +152,8 @@ class ChooseAreaFragment : Fragment() {
     private fun queryCounties() {
         title_text.text = selectedCity!!.cityName
         back_button.visibility = View.VISIBLE
-        countyList = DataSupport.where("cityid = ?",
-                selectedCity!!.id.toString()).find(County::class.java)
+        countyList = DataSupport.where("cityid = ?", selectedCity!!.id.toString())
+                .find(County::class.java)
         countyList?.let {
             if (it.isNotEmpty()) {
                 dataList.clear()

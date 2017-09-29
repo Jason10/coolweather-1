@@ -5,5 +5,10 @@
     <string name="comfort">"舒适度："</string>
     <string name="car">"洗车指数："</string>
     <string name="sport">"运动建议："</string>
+    <string name="suggestion">"生活建议"</string>
+    <string name="air">"空气质量"</string>
+    <string name="aqi">"AQI指数"</string>
+    <string name="pm25">"PM2.5指数"</string>
+    <string name="precast">"预报"</string>
 
 </resources>

@@ -1,25 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:orientation="vertical"
+    android:orientation="horizontal"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_margin="15dp">
+    android:layout_margin="@dimen/layout_margin"
+    android:background="@color/layout_back">
 
     <TextView
         android:id="@+id/degree_text"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="2"
         android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:textColor="#fff"
-        android:textSize="60sp" />
+        android:gravity="start"
+        android:layout_marginStart="@dimen/layout_margin"
+        android:textColor="@color/white_text"
+        android:textSize="@dimen/main_text" />
 
     <TextView
         android:id="@+id/weather_info_text"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
+        android:layout_weight="2"
         android:layout_height="wrap_content"
-        android:layout_gravity="end"
-        android:textColor="#fff"
-        android:textSize="20sp" />
+        android:gravity="end"
+        android:layout_marginEnd="@dimen/layout_margin"
+        android:textColor="@color/white_text"
+        android:textSize="@dimen/main_text" />
 
 </LinearLayout>
